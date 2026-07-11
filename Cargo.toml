@@ -2,6 +2,20 @@
 name = "poprako-orchestra-extra"
 version = "0.1.0"
 edition = "2024"
+description = "Practical extensions for the poprako-orchestra Rust ecosystem"
+license = "MIT"
+repository = "https://github.com/poprako-dev/poprako-orchestra-extra"
+documentation = "https://docs.rs/poprako-orchestra-extra"
+readme = "README.md"
+keywords = ["outbox", "transaction", "async", "message-queue", "orchestra"]
+categories = ["asynchronous", "rust-patterns"]
+include = ["src/**", "Cargo.toml", "README.md", "LICENSE"]
+
+[features]
+promise = []
 
 [dependencies]
 poprako-orchestra = "0.2.0"
+
+[package.metadata.docs.rs]
+all-features = true
