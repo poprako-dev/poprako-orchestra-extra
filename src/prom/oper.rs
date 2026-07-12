@@ -23,7 +23,9 @@ where
 {
     /// The task to persist for deferred delivery.
     pub task: Task<'a, I, P>,
-    output: PhantomData<fn() -> O>,
+
+    #[doc(hidden)]
+    _m: PhantomData<O>,
 }
 
 impl<'a, I, P, O> Defer<'a, I, P, O>
@@ -35,7 +37,7 @@ where
     pub fn new(task: Task<'a, I, P>) -> Self {
         Self {
             task,
-            output: PhantomData,
+            _m: PhantomData,
         }
     }
 }
@@ -65,7 +67,9 @@ where
     /// The tasks to persist. An empty slice is valid and is a no-op unless an
     /// adapter documents different behavior.
     pub tasks: &'t [Task<'a, I, P>],
-    output: PhantomData<fn() -> O>,
+
+    #[doc(hidden)]
+    _m: PhantomData<O>,
 }
 
 impl<'t, 'a, I, P, O> DeferBatch<'t, 'a, I, P, O>
@@ -77,7 +81,7 @@ where
     pub fn new(tasks: &'t [Task<'a, I, P>]) -> Self {
         Self {
             tasks,
-            output: PhantomData,
+            _m: PhantomData,
         }
     }
 }

@@ -52,8 +52,6 @@ where
 mod tests {
     use super::*;
 
-    use std::future::Future;
-
     struct Context;
 
     struct Producer;
@@ -61,24 +59,24 @@ mod tests {
     impl Step<Defer<'_, String, [u8], String>, Context> for Producer {
         type Error = ();
 
-        fn step(
+        async fn step(
             &self,
             _: &mut Context,
             _: &Defer<'_, String, [u8], String>,
-        ) -> impl Future<Output = Result<String, Self::Error>> + Send {
-            async { Ok(String::new()) }
+        ) -> Result<String, Self::Error> {
+            Ok(String::new())
         }
     }
 
     impl Step<DeferBatch<'_, '_, String, [u8], usize>, Context> for Producer {
         type Error = ();
 
-        fn step(
+        async fn step(
             &self,
             _: &mut Context,
             _: &DeferBatch<'_, '_, String, [u8], usize>,
-        ) -> impl Future<Output = Result<usize, Self::Error>> + Send {
-            async { Ok(0) }
+        ) -> Result<usize, Self::Error> {
+            Ok(0)
         }
     }
 
