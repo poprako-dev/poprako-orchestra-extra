@@ -1,6 +1,6 @@
 [package]
 name = "poprako-orchestra-extra"
-version = "0.2.1"
+version = "0.3.0"
 edition = "2024"
 description = "Practical extensions for the poprako-orchestra Rust ecosystem"
 license = "MIT"
@@ -15,7 +15,7 @@ include = ["src/**", "Cargo.toml", "README.md", "LICENSE"]
 promise = []
 
 [dependencies]
-poprako-orchestra = "0.2.0"
+poprako-orchestra = "0.6.0"
 
 [package.metadata.docs.rs]
 all-features = true

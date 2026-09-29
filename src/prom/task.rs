@@ -1,6 +1,6 @@
-//! The [`Task`] payload type for outbox producer operations.
+//! The [`Task`](crate::prom::task::Task) payload type for outbox producer operations.
 //!
-//! [`Task`] carries the stable message identity, payload, and optional delay
+//! [`Task`](crate::prom::task::Task) carries the stable message identity, payload, and optional delay
 //! that a producer persists to the local outbox table. It is the data unit
 //! shared by [`Defer`](crate::prom::oper::Defer) and
 //! [`DeferBatch`](crate::prom::oper::DeferBatch).

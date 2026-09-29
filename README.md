@@ -27,7 +27,7 @@ Extensions are opt-in. Enable the currently available `promise` feature:
 
 ```toml
 [dependencies]
-poprako-orchestra-extra = { version = "0.2", features = ["promise"] }
+poprako-orchestra-extra = { version = "0.3", features = ["promise"] }
 ```
 
 ## Core concepts
@@ -37,7 +37,7 @@ poprako-orchestra-extra = { version = "0.2", features = ["promise"] }
 | `prom::task::Task` | Stable message ID, payload, and optional delivery delay for one outbox record. |
 | `prom::oper::Defer` | Operation that persists one `Task` and is generic over its successful output. |
 | `prom::oper::DeferBatch` | Operation that persists a borrowed slice of `Task` values and is generic over its successful output. |
-| `prom::Prom` | Contract that declares independent single-task and batch output types and implements both matching `Step` values. |
+| `prom::Prom` | Contract that carries both operations, their transaction-level guards, a shared error, and independent output types. |
 
 `Task::delay` controls delivery eligibility: `None` makes the message eligible
 immediately, while `Some(Duration)` requests a minimum delay measured from the
@@ -47,18 +47,28 @@ time the outbox record is persisted.
 
 Implement both `poprako_orchestra::Step<Defer<'_, I, P, O>, C>` and
 `poprako_orchestra::Step<DeferBatch<'_, '_, I, P, O>, C>` for the adapter that
-writes to the local outbox. Then implement `Prom` to associate the distinct
-successful output types for the single-task and batch paths.
+writes to the local outbox. Then implement `Prom` to associate the shared error
+and distinct successful output types for the single-task and batch paths. `Prom` carries
+both operation bounds and their transaction-level guards; generic callers
+do not need to repeat `Step` or `LevelGuard` bounds.
 
 ```rust,ignore
-use poprako_orchestra::Step;
+use poprako_orchestra::{Context, Level, Step};
 use poprako_orchestra_extra::prom::oper::{Defer, DeferBatch};
 use poprako_orchestra_extra::prom::task::Task;
 use poprako_orchestra_extra::prom::Prom;
 
 struct OutboxProducer;
 
+struct DatabaseLevel;
+impl Level for DatabaseLevel {}
+
+impl Context for DatabaseTransaction {
+    type Level = DatabaseLevel;
+}
+
 impl Step<Defer<'_, String, [u8], OutboxRecordId>, DatabaseTransaction> for OutboxProducer {
+    type Level = DatabaseLevel;
     type Error = DatabaseError;
 
     async fn step(
@@ -77,6 +87,7 @@ impl Step<Defer<'_, String, [u8], OutboxRecordId>, DatabaseTransaction> for Outb
 impl Step<DeferBatch<'_, '_, String, [u8], Vec<OutboxRecordId>>, DatabaseTransaction>
     for OutboxProducer
 {
+    type Level = DatabaseLevel;
     type Error = DatabaseError;
 
     async fn step(
@@ -89,16 +100,23 @@ impl Step<DeferBatch<'_, '_, String, [u8], Vec<OutboxRecordId>>, DatabaseTransac
 }
 
 impl Prom<DatabaseTransaction, String, [u8]> for OutboxProducer {
+    type Error = DatabaseError;
+
     type IndivOutput = OutboxRecordId;
 
     type BatchOutput = Vec<OutboxRecordId>;
 }
 
-fn requires_outbox_producer<P>(producer: P)
+async fn defer_message<C, P>(
+    producer: &P,
+    transaction: &mut C,
+    task: Task<'_, String, [u8]>,
+) -> Result<P::IndivOutput, DatabaseError>
 where
-    P: Prom<DatabaseTransaction, String, [u8]>,
+    C: Context,
+    P: Prom<C, String, [u8], Error = DatabaseError>,
 {
-    // Use `producer` wherever an outbox-producing step is required.
+    producer.step(transaction, &Defer::new(task)).await
 }
 ```
 

@@ -4,13 +4,13 @@ version = 4
 
 [[package]]
 name = "poprako-orchestra"
-version = "0.2.0"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9f5f2cfe68ca8b70bbbe4cb4e17fa1cd45a58ba97d94bf1a50519e03d418f7db"
+checksum = "b51fbc48f58a5c8c49f3be5f00f6babc594edc99453dfcdfbf9ff87b725ef75d"
 
 [[package]]
 name = "poprako-orchestra-extra"
-version = "0.2.1"
+version = "0.3.0"
 dependencies = [
  "poprako-orchestra",
 ]

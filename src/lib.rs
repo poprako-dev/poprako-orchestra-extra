@@ -1,7 +1,7 @@
 //! Opt-in extensions for the `poprako-orchestra` step ecosystem.
 //!
 //! This crate provides producer-side outbox abstractions as an optional add-on
-//! to [`poprako-orchestra`]. The available extensions are gated behind Cargo
+//! to [`poprako-orchestra`](poprako_orchestra). The available extensions are gated behind Cargo
 //! features:
 //!
 //! - **`promise`** — Producer-side step contracts (`Defer`, `DeferBatch`) and

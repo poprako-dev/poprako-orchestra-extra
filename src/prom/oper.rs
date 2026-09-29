@@ -25,7 +25,7 @@ where
     pub task: Task<'a, I, P>,
 
     #[doc(hidden)]
-    _m: PhantomData<O>,
+    _m: PhantomData<fn(O)>,
 }
 
 impl<'a, I, P, O> Defer<'a, I, P, O>
@@ -34,7 +34,7 @@ where
     P: ?Sized,
 {
     /// Creates a one-task operation with the output type selected by `O`.
-    pub fn new(task: Task<'a, I, P>) -> Self {
+    pub const fn new(task: Task<'a, I, P>) -> Self {
         Self {
             task,
             _m: PhantomData,
@@ -69,7 +69,7 @@ where
     pub tasks: &'t [Task<'a, I, P>],
 
     #[doc(hidden)]
-    _m: PhantomData<O>,
+    _m: PhantomData<fn(O)>,
 }
 
 impl<'t, 'a, I, P, O> DeferBatch<'t, 'a, I, P, O>
@@ -78,7 +78,7 @@ where
     P: ?Sized,
 {
     /// Creates a batch operation with the output type selected by `O`.
-    pub fn new(tasks: &'t [Task<'a, I, P>]) -> Self {
+    pub const fn new(tasks: &'t [Task<'a, I, P>]) -> Self {
         Self {
             tasks,
             _m: PhantomData,
